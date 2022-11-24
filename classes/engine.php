@@ -158,7 +158,11 @@ class engine extends \core_search\engine {
         $client = new \search_elastic\esrequest();
         $response = $client->get($indexeurl);
         $responsebody = json_decode($response->getBody());
-        $indexfields = $responsebody->{$this->config->index}->mappings->doc->properties;
+        if ($this->get_es_lucene_version() < 8) {
+            $indexfields = $responsebody->{$this->config->index}->mappings->doc->properties;
+        } else {
+            $indexfields = $responsebody->{$this->config->index}->mappings->properties;
+        }
 
         // Iterrate through required fields and compare to index.
         $requiredfields = \search_elastic\document::get_required_fields_definition();
@@ -172,48 +176,56 @@ class engine extends \core_search\engine {
     }
 
     /**
-     * Get the version of the attached Elasticsearch service.
+     * Get the version of the attached Elasticsearch / OpenSearch service.
      *
-     * @return integer $version The version of Elasticsearch service.
+     * @return object Apache Lucene version details.
      */
-    private function get_es_version() {
+    private function get_es_version_details() {
         $url = $this->get_url();
         $client = new \search_elastic\esrequest();
         $response = $client->get($url);
         $responsebody = json_decode($response->getBody());
 
-        $version = $responsebody->version->number;
+        return $responsebody->version;
+    }
 
-        return $version;
+    /**
+     * Get the Apache Lucene version of the attached Elasticsearch / OpenSearch service.
+     *
+     * @return integer The Apache Lucene version.
+     */
+    public function get_es_lucene_version() {
+        return $this->get_es_version_details()->lucene_version;
+    }
+
+    /**
+     * Get the version of the attached Elasticsearch / OpenSearch service.
+     *
+     * @return integer The Elasticsearch / OpenSearch version.
+     */
+    public function get_es_version() {
+        return $this->get_es_version_details()->number;
     }
 
     /**
      * Get the Elasticsearch mapping.
      *
-     * @param integer $version The version of Elasticsearch to get the mapping for.
+     * @param integer $luceneversion The version of Apache Lucene to get the mapping for.
      * @return array $mapping  The Elasticsearch mapping.
      */
-    public function get_mapping($version=false) {
+    public function get_mapping($luceneversion=0) {
         $requiredfields = \search_elastic\document::get_required_fields_definition();
         $optionalfields = \search_elastic\document::get_optional_fields_definition();
         $fields = array_merge($requiredfields, $optionalfields);
 
-        $mapping = array('mappings' => array('doc' => array('properties' => $fields)));
-
-        // We need to change some of the mappings if Elasticsearch version is less than 5.
-        if (!$version) {
-            $version = $this->get_es_version();
+        // We need to change some of the mappings if Apache Lucene version is less than 8.
+        if (!$luceneversion) {
+            $luceneversion = $this->get_es_lucene_version();
         }
-
-        if ($version < 5) {
-            $mapping['mappings']['doc']['properties']['id']['type'] = 'string';
-            $mapping['mappings']['doc']['properties']['id']['index'] = 'not_analyzed';
-            $mapping['mappings']['doc']['properties']['parentid']['type'] = 'string';
-            $mapping['mappings']['doc']['properties']['parentid']['index'] = 'not_analyzed';
-            $mapping['mappings']['doc']['properties']['title']['type'] = 'string';
-            $mapping['mappings']['doc']['properties']['content']['type'] = 'string';
-            $mapping['mappings']['doc']['properties']['areaid']['type'] = 'string';
-            $mapping['mappings']['doc']['properties']['areaid']['index'] = 'not_analyzed';
+        if ($luceneversion < 8) {
+            $mapping = ['mappings' => ['doc' => ['properties' => $fields]]];
+        } else {
+            $mapping = ['mappings' => ['properties' => $fields]];
         }
 
         return $mapping;
@@ -318,7 +330,12 @@ class engine extends \core_search\engine {
         if (!isset($results->hits)) {
             $returnarray = array(0, array());
         } else {
-            $returnarray = array($results->hits->total, $results->hits->hits);
+            if (is_object($results->hits->total)) {
+                $totalhits = $results->hits->total->value;
+            } else {
+                $totalhits = $results->hits->total;
+            }
+            $returnarray = array($totalhits, $results->hits->hits);
         }
 
         return $returnarray;
@@ -409,13 +426,24 @@ class engine extends \core_search\engine {
      * sent to Elasticsearch.
      *
      * @param object $docdata Object containing document information to index.
+     * @param integer $luceneversion Apache Lucene version to get the mapping for.
      * @return string The JSON representation of doc data, ready to be indexed.
      */
-    private function create_payload($docdata) {
+    private function create_payload($docdata, $luceneversion=0) {
 
-        $meta = array('index' => array('_index' => $this->config->index,
-                                       '_type' => 'doc',
-                                       '_id' => $docdata['id']));
+        // We need to change some of the mappings if Apache Lucene version is less than 8.
+        if (!$luceneversion) {
+            $luceneversion = $this->get_es_lucene_version();
+        }
+        if ($luceneversion < 8) {
+            $meta = ['index' => ['_index' => $this->config->index,
+                                 '_type' => 'doc',
+                                 '_id' => $docdata['id']]];
+        } else {
+            $meta = ['index' => ['_index' => $this->config->index,
+                                 '_id' => $docdata['id']]];
+        }
+
         $jsonmeta = json_encode($meta);
         $jsondoc = json_encode($docdata);
         $jsonpayload = $jsonmeta . "\n" . $jsondoc. "\n";
@@ -629,12 +657,20 @@ class engine extends \core_search\engine {
      *
      * @param document $document
      * @param bool $fileindexing are we indexing files
+     * @param integer $luceneversion Apache Lucene version to get the mapping for.
      * @return bool
      */
-    public function add_document($document, $fileindexing = false) {
+    public function add_document($document, $fileindexing = false, $luceneversion=0) {
         $docdata = $document->export_for_engine();
         $url = $this->get_url();
-        $docurl = $url . '/'. $this->config->index . '/doc/' . $docdata['id'];
+        if (!$luceneversion) {
+            $luceneversion = $this->get_es_lucene_version();
+        }
+        $docprefix = '_';
+        if ($luceneversion < 8) {
+            $docprefix = '';
+        }
+        $docurl = $url . '/'. $this->config->index . '/' . $docprefix . 'doc/' . $docdata['id'];
         $jsondoc = json_encode($docdata);
 
         $client = new \search_elastic\esrequest();
@@ -768,7 +804,11 @@ class engine extends \core_search\engine {
 
             // Iterate through results.
             if (isset($results->hits)) {
-                $totalhits = $results->hits->total;
+                if (is_object($results->hits->total)) {
+                    $totalhits = $results->hits->total->value;
+                } else {
+                    $totalhits = $results->hits->total;
+                }
                 $docs = array_merge($docs, $this->compile_results($results, $limit));
                 $docoffest = count($docs);
             }
@@ -783,11 +823,19 @@ class engine extends \core_search\engine {
      * Deletes the specified document.
      *
      * @param string $id The document id to delete
+     * @param integer $luceneversion Apache Lucene version to get the mapping for.
      * @return void
      */
-    public function delete_by_id($id) {
+    public function delete_by_id($id, $luceneversion=0) {
+        if (!$luceneversion) {
+            $luceneversion = $this->get_es_lucene_version();
+        }
+        $docprefix = '_';
+        if ($luceneversion < 8) {
+            $docprefix = '';
+        }
         $url = $this->get_url();
-        $deleteurl = $url . '/'. $this->config->index . '/doc/'. $id;
+        $deleteurl = $url . '/'. $this->config->index . '/' . $docprefix . 'doc/'. $id;
         $client = new \search_elastic\esrequest();
 
         $client->delete($deleteurl);
