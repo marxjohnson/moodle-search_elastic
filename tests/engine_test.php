@@ -92,6 +92,7 @@ class engine_test extends \advanced_testcase {
         $this->generator->setup();
 
         $this->engine = new \search_elastic\testable_engine();
+        $this->luceneversion = $this->engine->get_es_lucene_version();
         $this->search = \testable_core_search::instance($this->engine);
         $areaid = \core_search\manager::generate_areaid('core_mocksearch', 'mock_search_area');
         $this->search->add_search_area($areaid, new \core_mocksearch\search\mock_search_area());
@@ -180,7 +181,7 @@ class engine_test extends \advanced_testcase {
         $area = new \core_mocksearch\search\mock_search_area();
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.
@@ -206,34 +207,31 @@ class engine_test extends \advanced_testcase {
     }
 
     /**
-     * Test mapping updates for old versions of Elasticsearch.
+     * Test mapping updates for old Apache Lucene version 7 of Elasticsearch / OpenSearch.
      */
     public function test_get_mapping_old() {
-        $mapping = $this->engine->get_mapping(2.4);
+        $mapping = $this->engine->get_mapping(7);
 
         // Check mapping has been updated.
-        $this->assertEquals($mapping['mappings']['doc']['properties']['id']['type'], 'string');
-        $this->assertEquals($mapping['mappings']['doc']['properties']['id']['index'], 'not_analyzed');
-        $this->assertEquals($mapping['mappings']['doc']['properties']['parentid']['type'], 'string');
-        $this->assertEquals($mapping['mappings']['doc']['properties']['parentid']['index'], 'not_analyzed');
-        $this->assertEquals($mapping['mappings']['doc']['properties']['title']['type'], 'string');
-        $this->assertEquals($mapping['mappings']['doc']['properties']['content']['type'], 'string');
-        $this->assertEquals($mapping['mappings']['doc']['properties']['areaid']['type'], 'string');
-        $this->assertEquals($mapping['mappings']['doc']['properties']['areaid']['index'], 'not_analyzed');
-    }
-
-    /**
-     * Test mapping updates for new versions of Elasticsearch.
-     */
-    public function test_get_mapping() {
-        $mapping = $this->engine->get_mapping(6);
-
-        // Check mapping has not been updated.
         $this->assertEquals($mapping['mappings']['doc']['properties']['id']['type'], 'keyword');;
         $this->assertEquals($mapping['mappings']['doc']['properties']['parentid']['type'], 'keyword');;
         $this->assertEquals($mapping['mappings']['doc']['properties']['title']['type'], 'text');
         $this->assertEquals($mapping['mappings']['doc']['properties']['content']['type'], 'text');
         $this->assertEquals($mapping['mappings']['doc']['properties']['areaid']['type'], 'keyword');
+    }
+
+    /**
+     * Test mapping updates for new Apache Lucene version 8 of Elasticsearch / OpenSearch.
+     */
+    public function test_get_mapping() {
+        $mapping = $this->engine->get_mapping(8);
+
+        // Check mapping has not been updated.
+        $this->assertEquals($mapping['mappings']['properties']['id']['type'], 'keyword');;
+        $this->assertEquals($mapping['mappings']['properties']['parentid']['type'], 'keyword');;
+        $this->assertEquals($mapping['mappings']['properties']['title']['type'], 'text');
+        $this->assertEquals($mapping['mappings']['properties']['content']['type'], 'text');
+        $this->assertEquals($mapping['mappings']['properties']['areaid']['type'], 'keyword');
     }
 
     /**
@@ -248,7 +246,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.
@@ -279,7 +277,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.
@@ -332,21 +330,21 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         $rec2 = new \stdClass();
         $rec2->content = "this is a quiz on fish and birds";
         $area = $this->area;
         $record2 = $this->generator->create_record($rec2);
         $doc2 = $area->get_document($record2);
-        $this->engine->add_document($doc2);
+        $this->engine->add_document($doc2, false, $this->luceneversion);
 
         $rec3 = new \stdClass();
         $rec3->content = "this is an activity about volcanic rocks";
         $area = $this->area;
         $record3 = $this->generator->create_record($rec3);
         $doc3 = $area->get_document($record3);
-        $this->engine->add_document($doc3);
+        $this->engine->add_document($doc3, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.
@@ -390,7 +388,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         $rec2 = new \stdClass();
         $rec2->content = "this is an assignment on frogs and toads";
@@ -398,7 +396,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record2 = $this->generator->create_record($rec2);
         $doc2 = $area->get_document($record2);
-        $this->engine->add_document($doc2);
+        $this->engine->add_document($doc2, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.
@@ -431,7 +429,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.
@@ -471,7 +469,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         $rec2 = new \stdClass();
         $rec2->content = "this is an assignment on frogs and toads";
@@ -479,7 +477,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record2 = $this->generator->create_record($rec2);
         $doc2 = $area->get_document($record2);
-        $this->engine->add_document($doc2);
+        $this->engine->add_document($doc2, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.
@@ -514,21 +512,21 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         $rec2 = new \stdClass();
         $rec2->content = "this is a quiz on fish and frogs";
         $area = $this->area;
         $record2 = $this->generator->create_record($rec2);
         $doc2 = $area->get_document($record2);
-        $this->engine->add_document($doc2);
+        $this->engine->add_document($doc2, false, $this->luceneversion);
 
         $rec3 = new \stdClass();
         $rec3->content = "this is an assignment about volcanic rocks";
         $area = $this->areaboost;
         $record3 = $this->generator->create_record($rec3);
         $doc3 = $area->get_document($record3);
-        $this->engine->add_document($doc3);
+        $this->engine->add_document($doc3, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.
@@ -576,7 +574,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         $rec2 = new \stdClass();
         $rec2->content = "this is a quiz on fish and frogs";
@@ -584,7 +582,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record2 = $this->generator->create_record($rec2);
         $doc2 = $area->get_document($record2);
-        $this->engine->add_document($doc2);
+        $this->engine->add_document($doc2, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.
@@ -631,7 +629,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         $rec2 = new \stdClass();
         $rec2->content = "this is a quiz on fish and frogs";
@@ -639,7 +637,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record2 = $this->generator->create_record($rec2);
         $doc2 = $area->get_document($record2);
-        $this->engine->add_document($doc2);
+        $this->engine->add_document($doc2, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.
@@ -677,7 +675,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         $rec2 = new \stdClass();
         $rec2->content = "this is an assignment on frogs and toads";
@@ -686,7 +684,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record2 = $this->generator->create_record($rec2);
         $doc2 = $area->get_document($record2);
-        $this->engine->add_document($doc2);
+        $this->engine->add_document($doc2, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.
@@ -717,7 +715,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         $rec2 = new \stdClass();
         $rec2->content = "this is an assignment on frogs and toads";
@@ -726,7 +724,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record2 = $this->generator->create_record($rec2);
         $doc2 = $area->get_document($record2);
-        $this->engine->add_document($doc2);
+        $this->engine->add_document($doc2, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.
@@ -757,7 +755,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         $rec2 = new \stdClass();
         $rec2->content = "this is an assignment on frogs and toads";
@@ -766,7 +764,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record2 = $this->generator->create_record($rec2);
         $doc2 = $area->get_document($record2);
-        $this->engine->add_document($doc2);
+        $this->engine->add_document($doc2, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.
@@ -796,7 +794,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         $rec2 = new \stdClass();
         $rec2->content = "this is an quiz on frogs and toads";
@@ -805,7 +803,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record2 = $this->generator->create_record($rec2);
         $doc2 = $area->get_document($record2);
-        $this->engine->add_document($doc2);
+        $this->engine->add_document($doc2, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.
@@ -839,7 +837,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         $rec2 = new \stdClass();
         $rec2->content = "this is an quiz on frogs and toads";
@@ -848,7 +846,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record2 = $this->generator->create_record($rec2);
         $doc2 = $area->get_document($record2);
-        $this->engine->add_document($doc2);
+        $this->engine->add_document($doc2, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.
@@ -882,7 +880,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         $rec2 = new \stdClass();
         $rec2->content = "this is an assignment on frogs and toads";
@@ -890,7 +888,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record2 = $this->generator->create_record($rec2);
         $doc2 = $area->get_document($record2);
-        $this->engine->add_document($doc2);
+        $this->engine->add_document($doc2, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.
@@ -922,7 +920,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         $rec2 = new \stdClass();
         $rec2->content = "this is an assignment on frogs and toads";
@@ -930,7 +928,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record2 = $this->generator->create_record($rec2);
         $doc2 = $area->get_document($record2);
-        $this->engine->add_document($doc2);
+        $this->engine->add_document($doc2, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.
@@ -960,7 +958,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.
@@ -992,7 +990,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.
@@ -1025,7 +1023,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.
@@ -1078,7 +1076,7 @@ class engine_test extends \advanced_testcase {
         $area = $this->area;
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.
