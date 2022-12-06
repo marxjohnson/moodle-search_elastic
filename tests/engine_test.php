@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace search_elastic;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -40,8 +42,9 @@ use \GuzzleHttp\Psr7\Response;
  * @package     search_elastic
  * @copyright   Matt Porritt <mattp@catalyst-au.net>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers      \search_elastic\engine
  */
-class search_elastic_engine_testcase extends advanced_testcase {
+class engine_test extends \advanced_testcase {
     /**
      * @var \core_search::manager
      */
@@ -89,13 +92,13 @@ class search_elastic_engine_testcase extends advanced_testcase {
         $this->generator->setup();
 
         $this->engine = new \search_elastic\testable_engine();
-        $this->search = testable_core_search::instance($this->engine);
+        $this->search = \testable_core_search::instance($this->engine);
         $areaid = \core_search\manager::generate_areaid('core_mocksearch', 'mock_search_area');
-        $this->search->add_search_area($areaid, new core_mocksearch\search\mock_search_area());
-        $this->area = new core_mocksearch\search\mock_search_area();
+        $this->search->add_search_area($areaid, new \core_mocksearch\search\mock_search_area());
+        $this->area = new \core_mocksearch\search\mock_search_area();
         $areaboostid = \core_search\manager::generate_areaid('core_mocksearch', 'mock_boost_area');
-        $this->search->add_search_area($areaboostid, new core_mocksearch\search\mock_boost_area());
-        $this->areaboost = new core_mocksearch\search\mock_boost_area();
+        $this->search->add_search_area($areaboostid, new \core_mocksearch\search\mock_boost_area());
+        $this->areaboost = new \core_mocksearch\search\mock_boost_area();
 
         $this->setAdminUser();
         $this->search->index(true);
@@ -134,7 +137,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         $stack = HandlerStack::create($mock);
 
         // Reflection magic as we are directly testing a private method.
-        $method = new ReflectionMethod('\search_elastic\engine', 'is_server_ready');
+        $method = new \ReflectionMethod('\search_elastic\engine', 'is_server_ready');
         $method->setAccessible(true); // Allow accessing of private method.
         $proxy = $method->invoke(new \search_elastic\engine, $stack);
 
@@ -155,7 +158,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         $stack = HandlerStack::create($mock);
 
         // Reflection magic as we are directly testing a private method.
-        $method = new ReflectionMethod('\search_elastic\engine', 'is_server_ready');
+        $method = new \ReflectionMethod('\search_elastic\engine', 'is_server_ready');
         $method->setAccessible(true); // Allow accessing of private method.
         $proxy = $method->invoke(new \search_elastic\engine, $stack);
 
@@ -174,7 +177,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         // Construct the search object and add it to the engine.
         $rec = new \stdClass();
         $rec->content = "elastic";
-        $area = new core_mocksearch\search\mock_search_area();
+        $area = new \core_mocksearch\search\mock_search_area();
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
         $this->engine->add_document($doc);
@@ -189,7 +192,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         sleep(1);
 
         // This is a mock of the search form submission.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = 'elastic';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -252,7 +255,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         sleep(1);
 
         // This is a mock of the search form submission.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = 'elastic';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -284,7 +287,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
 
         // This is a mock of the search form submission.
         // Multi term in order query.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = 'test quiz';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -295,7 +298,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
                 'this is a @@HI_S@@test@@HI_E@@ @@HI_S@@quiz@@HI_E@@ on frogs and toads'); // Check the results.
 
         // Multi term out of order query.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = 'quiz test';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -306,7 +309,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
                 'this is a @@HI_S@@test@@HI_E@@ @@HI_S@@quiz@@HI_E@@ on frogs and toads'); // Check the results.
 
         // Multi term partial words query.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = 'test frogs';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -351,7 +354,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
 
         // This is a mock of the search form submission.
         // Multi term in order query.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = 'assignment AND frogs';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -363,7 +366,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         $this->assertEquals(count($results), 1);
 
         // Multi term out of order query.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = 'assignment OR fish';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -402,7 +405,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         sleep(1);
 
         // This is a mock of the search form submission.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = 'assignment on frogs';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -435,7 +438,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         sleep(1);
 
         // This is a mock of the search form submission.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = 'assignment on frogs';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -444,7 +447,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         $results = $this->search->search($querydata); // Execute the search.
         $this->assertEquals(count($results), 0);
 
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = 'assignment on frogs';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -483,7 +486,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         sleep(1);
 
         // This is a mock of the search form submission.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = 'assignment on frogs';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -532,7 +535,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         sleep(1);
 
         // This is a mock of the search form submission.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = 'assignment frogs';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -588,7 +591,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         sleep(1);
 
         // This is a mock of the search form submission.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = 'fish and frogs';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -643,7 +646,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         sleep(1);
 
         // This is a mock of the search form submission.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = 'fish and frogs';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -690,7 +693,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         sleep(1);
 
         // This is a mock of the search form submission.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = '*';
         $querydata->timestart = 123457;
         $querydata->timeend = 0;
@@ -730,7 +733,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         sleep(1);
 
         // This is a mock of the search form submission.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = '*';
         $querydata->timestart = 0;
         $querydata->timeend = 123457;
@@ -770,7 +773,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         sleep(1);
 
         // This is a mock of the search form submission.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = '*';
         $querydata->timestart = 123457;
         $querydata->timeend = 123458;
@@ -809,7 +812,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         sleep(1);
 
         // This is a mock of the search form submission.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = '*';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -852,7 +855,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         sleep(1);
 
         // This is a mock of the search form submission.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = '*';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -894,7 +897,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         sleep(1);
 
         // This is a mock of the search form submission.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = 'assignment on frogs';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -934,7 +937,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         sleep(1);
 
         // This is a mock of the search form submission.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = 'assignment on frogs';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -964,7 +967,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         sleep(1);
 
         // This is a mock of the search form submission.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = 'frog';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -996,7 +999,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         sleep(1);
 
         // This is a mock of the search form submission.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = 'ogs';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -1029,7 +1032,7 @@ class search_elastic_engine_testcase extends advanced_testcase {
         sleep(1);
 
         // This is a mock of the search form submission.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = 'fro';
         $querydata->timestart = 0;
         $querydata->timeend = 0;

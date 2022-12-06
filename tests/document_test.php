@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace search_elastic;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -34,8 +36,9 @@ require_once($CFG->dirroot . '/search/engine/elastic/tests/fixtures/aws_rekognit
  * @package     search_elastic
  * @copyright   Matt Porritt <mattp@catalyst-au.net>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers      \search_elastic\document
  */
-class search_elastic_document_testcase extends advanced_testcase {
+class document_test extends \advanced_testcase {
 
     public function setUp(): void {
         $this->resetAfterTest();
@@ -65,7 +68,7 @@ class search_elastic_document_testcase extends advanced_testcase {
         $stub = $builder->getMock();
 
         // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\search_elastic\document', 'format_text');
+        $method = new \ReflectionMethod('\search_elastic\document', 'format_text');
         $method->setAccessible(true); // Allow accessing of private method.
         $proxy = $method->invoke($stub, $text); // Get result of invoked method.
 
@@ -84,7 +87,7 @@ class search_elastic_document_testcase extends advanced_testcase {
         $stub = $builder->getMock();
 
         // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\search_elastic\document', 'format_text');
+        $method = new \ReflectionMethod('\search_elastic\document', 'format_text');
         $method->setAccessible(true); // Allow accessing of private method.
         $proxy = $method->invoke($stub, $text); // Get result of invoked method.
 
@@ -104,7 +107,7 @@ class search_elastic_document_testcase extends advanced_testcase {
         $stub = $builder->getMock();
 
         // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\search_elastic\document', 'get_enrichment_processors');
+        $method = new \ReflectionMethod('\search_elastic\document', 'get_enrichment_processors');
         $method->setAccessible(true); // Allow accessing of private method.
         $proxy = $method->invoke($stub); // Get result of invoked method.
 
@@ -131,7 +134,7 @@ class search_elastic_document_testcase extends advanced_testcase {
         // Construct the search object.
         $rec = new \stdClass();
         $rec->content = "elastic";
-        $area = new core_mocksearch\search\mock_search_area();
+        $area = new \core_mocksearch\search\mock_search_area();
         $record = $this->generator->create_record($rec);
         $info = unserialize($record->info);
 
@@ -182,7 +185,7 @@ class search_elastic_document_testcase extends advanced_testcase {
         // Construct the search object.
         $rec = new \stdClass();
         $rec->content = "elastic";
-        $area = new core_mocksearch\search\mock_search_area();
+        $area = new \core_mocksearch\search\mock_search_area();
         $record = $this->generator->create_record($rec);
         $info = unserialize($record->info);
 

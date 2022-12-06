@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace search_elastic;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -32,8 +34,9 @@ global $CFG;
  * @package     search_elastic
  * @copyright   Matt Porritt <mattp@catalyst-au.net>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers      \search_elastic\query
  */
-class search_elastic_query_testcase extends advanced_testcase {
+class query_test extends \advanced_testcase {
 
     /**
      * Test getting areas that have been boosted in plugin config
@@ -74,7 +77,7 @@ class search_elastic_query_testcase extends advanced_testcase {
         $boostedareas = array('boost_mod_assign-activity' => 2);
 
         // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\search_elastic\query', 'consruct_boosting');
+        $method = new \ReflectionMethod('\search_elastic\query', 'consruct_boosting');
         $method->setAccessible(true); // Allow accessing of private method.
         $proxy = $method->invoke(new \search_elastic\query, $boostedareas); // Get result of invoked method.
 
@@ -90,7 +93,7 @@ class search_elastic_query_testcase extends advanced_testcase {
         $boostedareas = array();
 
         // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\search_elastic\query', 'consruct_boosting');
+        $method = new \ReflectionMethod('\search_elastic\query', 'consruct_boosting');
         $method->setAccessible(true); // Allow accessing of private method.
         $proxy = $method->invoke(new \search_elastic\query, $boostedareas); // Get result of invoked method.
 
@@ -132,7 +135,7 @@ class search_elastic_query_testcase extends advanced_testcase {
      */
     public function test_consruct_location_boosting() {
         // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\search_elastic\query', 'consruct_location_boosting');
+        $method = new \ReflectionMethod('\search_elastic\query', 'consruct_location_boosting');
         $method->setAccessible(true); // Allow accessing of private method.
         $proxy = $method->invoke(new \search_elastic\query, 'courseid', '4' , 2); // Get result of invoked method.
 
@@ -146,7 +149,7 @@ class search_elastic_query_testcase extends advanced_testcase {
      */
     public function test_get_query_date_sort_asc() {
         // This is a mock of the search form submission.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = '*';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -163,7 +166,7 @@ class search_elastic_query_testcase extends advanced_testcase {
      */
     public function test_get_query_date_sort_desc() {
         // This is a mock of the search form submission.
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = '*';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -179,12 +182,12 @@ class search_elastic_query_testcase extends advanced_testcase {
      * Test query timerange construction timestart only.
      */
     public function test_construct_time_range_timestart() {
-        $filters = new stdClass();
+        $filters = new \stdClass();
         $filters->timestart = 123456;
         $filters->timeend = 0;
 
         // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\search_elastic\query', 'construct_time_range');
+        $method = new \ReflectionMethod('\search_elastic\query', 'construct_time_range');
         $method->setAccessible(true); // Allow accessing of private method.
         $proxy = $method->invoke(new \search_elastic\query, $filters); // Get result of invoked method.
 
@@ -197,12 +200,12 @@ class search_elastic_query_testcase extends advanced_testcase {
      * Test query timerange construction timeend only.
      */
     public function test_construct_time_range_timeend() {
-        $filters = new stdClass();
+        $filters = new \stdClass();
         $filters->timestart = 0;
         $filters->timeend = 123456;
 
         // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\search_elastic\query', 'construct_time_range');
+        $method = new \ReflectionMethod('\search_elastic\query', 'construct_time_range');
         $method->setAccessible(true); // Allow accessing of private method.
         $proxy = $method->invoke(new \search_elastic\query, $filters); // Get result of invoked method.
 
@@ -215,12 +218,12 @@ class search_elastic_query_testcase extends advanced_testcase {
      * Test query timerange construction.
      */
     public function test_construct_time_range_timestart_timeend() {
-        $filters = new stdClass();
+        $filters = new \stdClass();
         $filters->timestart = 123456;
         $filters->timeend = 567890;
 
         // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\search_elastic\query', 'construct_time_range');
+        $method = new \ReflectionMethod('\search_elastic\query', 'construct_time_range');
         $method->setAccessible(true); // Allow accessing of private method.
         $proxy = $method->invoke(new \search_elastic\query, $filters); // Get result of invoked method.
 
@@ -233,7 +236,7 @@ class search_elastic_query_testcase extends advanced_testcase {
      * Test we can extract usercontexts from access info data.
      */
     public function test_extract_usercontexts() {
-        $method = new ReflectionMethod('\search_elastic\query', 'extract_usercontexts');
+        $method = new \ReflectionMethod('\search_elastic\query', 'extract_usercontexts');
         $method->setAccessible(true); // Allow accessing of private method.
 
         $actual = $method->invoke(new \search_elastic\query, false);
@@ -251,23 +254,23 @@ class search_elastic_query_testcase extends advanced_testcase {
         $actual = $method->invoke(new \search_elastic\query, ['Test']);
         $this->assertEquals(['Test'], $actual);
 
-        $accessinfo = new stdClass();
+        $accessinfo = new \stdClass();
         $accessinfo->usercontexts = ['Test'];
         $actual = $method->invoke(new \search_elastic\query, $accessinfo);
         $this->assertEquals(['Test'], $actual);
 
-        $accessinfo = new stdClass();
+        $accessinfo = new \stdClass();
         $accessinfo->usercontexts = ['Test'];
         $accessinfo->everything = true;
         $actual = $method->invoke(new \search_elastic\query, $accessinfo);
         $this->assertEquals(null, $actual);
 
-        $accessinfo = new stdClass();
+        $accessinfo = new \stdClass();
         $accessinfo->everything = false;
         $actual = $method->invoke(new \search_elastic\query, $accessinfo);
         $this->assertEquals(null, $actual);
 
-        $accessinfo = new stdClass();
+        $accessinfo = new \stdClass();
         $accessinfo->usercontexts = ['Test'];
         $accessinfo->everything = false;
         $actual = $method->invoke(new \search_elastic\query, $accessinfo);
@@ -280,7 +283,7 @@ class search_elastic_query_testcase extends advanced_testcase {
     public function test_get_query_add_filters_based_on_accessinfo() {
         $query = new \search_elastic\query();
 
-        $querydata = new stdClass();
+        $querydata = new \stdClass();
         $querydata->q = '*';
         $querydata->timestart = 0;
         $querydata->timeend = 0;
@@ -319,7 +322,7 @@ class search_elastic_query_testcase extends advanced_testcase {
         $this->assertEquals($expected, $result['query']['bool']['filter']['bool']['must'][0]['terms']['contextid']);
 
         // Assesinfo as object.
-        $accessinfo = new stdClass();
+        $accessinfo = new \stdClass();
         $accessinfo->everything = true;
         $accessinfo->usercontexts = [
             'test-area' => [1, 2, 3],
@@ -328,13 +331,13 @@ class search_elastic_query_testcase extends advanced_testcase {
         $this->assertFalse(isset($result['query']['bool']['filter']['bool']['must'][0]['terms']['contextid']));
 
         // Assesinfo as object.
-        $accessinfo = new stdClass();
+        $accessinfo = new \stdClass();
         $accessinfo->everything = false;
         $result = $query->get_query($querydata, $accessinfo);
         $this->assertFalse(isset($result['query']['bool']['filter']['bool']['must'][0]['terms']['contextid']));
 
         // Assesinfo as object.
-        $accessinfo = new stdClass();
+        $accessinfo = new \stdClass();
         $accessinfo->usercontexts = [
             'test-area' => [],
         ];
@@ -343,7 +346,7 @@ class search_elastic_query_testcase extends advanced_testcase {
         $this->assertEquals($expected, $result['query']['bool']['filter']['bool']['must'][0]['terms']['contextid']);
 
         // Assesinfo as object.
-        $accessinfo = new stdClass();
+        $accessinfo = new \stdClass();
         $accessinfo->usercontexts = [
             'test-area' => [1, 2, 3],
         ];
@@ -352,7 +355,7 @@ class search_elastic_query_testcase extends advanced_testcase {
         $this->assertEquals($expected, $result['query']['bool']['filter']['bool']['must'][0]['terms']['contextid']);
 
         // Assesinfo as object.
-        $accessinfo = new stdClass();
+        $accessinfo = new \stdClass();
         $accessinfo->everything = false;
         $accessinfo->usercontexts = [
             'test-area' => [1, 2, 3],
@@ -362,7 +365,7 @@ class search_elastic_query_testcase extends advanced_testcase {
         $this->assertEquals($expected, $result['query']['bool']['filter']['bool']['must'][0]['terms']['contextid']);
 
         // Assesinfo as object.
-        $accessinfo = new stdClass();
+        $accessinfo = new \stdClass();
         $accessinfo->everything = false;
         $accessinfo->usercontexts = [
             'test-area' => [1, 2, 3],
@@ -455,7 +458,7 @@ class search_elastic_query_testcase extends advanced_testcase {
      */
     public function test_construct_wildcard($q, $start, $end, $expected) {
         // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\search_elastic\query', 'add_wildcards');
+        $method = new \ReflectionMethod('\search_elastic\query', 'add_wildcards');
         $method->setAccessible(true); // Allow accessing of private method.
 
         $proxy = $method->invoke(new \search_elastic\query, $q, $start, $end);
