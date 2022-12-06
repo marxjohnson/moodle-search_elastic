@@ -24,12 +24,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2022011600;
-$plugin->release   = '3.10 Build (2022011600)'; // Build same as version.
+$plugin->version   = 2022120600;
+$plugin->release   = '4.1 Build (2022120600)'; // Build same as version.
 $plugin->requires  = 2016052304;
 $plugin->component = 'search_elastic';
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->dependencies = array(
         'local_aws' => 2020061500
 );
-$plugin->supported = [310, 311];      // A range of branch numbers of supported moodle versions.
+$plugin->supported = [310, 401];      // A range of branch numbers of supported moodle versions.
