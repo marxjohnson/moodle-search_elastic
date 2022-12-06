@@ -22,9 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
+namespace search_elastic;
 
 /**
  * Elastic search engine enrichment form unit tests.
@@ -32,8 +30,9 @@ global $CFG;
  * @package     search_elastic
  * @copyright   Matt Porritt <mattp@catalyst-au.net>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers      \search_elastic\enrich_form
  */
-class search_elastic_enrich_form_testcase extends advanced_testcase {
+class enrich_form_test extends \advanced_testcase {
 
     /**
      * Test getting enrich classes class names.
@@ -50,7 +49,7 @@ class search_elastic_enrich_form_testcase extends advanced_testcase {
         $stub = $builder->getMock();
 
         // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\search_elastic\enrich_form', 'get_enrich_classes');
+        $method = new \ReflectionMethod('\search_elastic\enrich_form', 'get_enrich_classes');
         $method->setAccessible(true); // Allow accessing of private method.
         $proxy = $method->invoke($stub, 'text'); // Get result of invoked method.
 
@@ -74,7 +73,7 @@ class search_elastic_enrich_form_testcase extends advanced_testcase {
         $stub = $builder->getMock();
 
         // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\search_elastic\enrich_form', 'get_enrich_options');
+        $method = new \ReflectionMethod('\search_elastic\enrich_form', 'get_enrich_options');
         $method->setAccessible(true); // Allow accessing of private method.
         $proxy = $method->invoke($stub, $classname); // Get result of invoked method.
 

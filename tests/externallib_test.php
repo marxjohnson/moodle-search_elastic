@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace search_elastic;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -36,8 +38,9 @@ require_once($CFG->dirroot . '/search/engine/elastic/externallib.php');
  * @package     search_elastic
  * @copyright   Matt Porritt <mattp@catalyst-au.net>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers      \search_elastic_external
  */
-class search_elastic_engine_external_testcase extends advanced_testcase {
+class externallib_test extends \advanced_testcase {
     /**
      * @var \core_search::manager
      */
@@ -85,9 +88,9 @@ class search_elastic_engine_external_testcase extends advanced_testcase {
         $this->generator->setup();
 
         $this->engine = new \search_elastic\testable_engine();
-        $this->search = testable_core_search::instance($this->engine);
+        $this->search = \testable_core_search::instance($this->engine);
         $areaid = \core_search\manager::generate_areaid('core_mocksearch', 'mock_search_area');
-        $this->search->add_search_area($areaid, new core_mocksearch\search\mock_search_area());
+        $this->search->add_search_area($areaid, new \core_mocksearch\search\mock_search_area());
 
         $this->setAdminUser();
         $this->search->index(true);
@@ -122,7 +125,7 @@ class search_elastic_engine_external_testcase extends advanced_testcase {
         $rec = new \stdClass();
         $rec->content = "this is a video";
         $rec->courseid = 1;
-        $area = new core_mocksearch\search\mock_search_area();
+        $area = new \core_mocksearch\search\mock_search_area();
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
         $this->engine->add_document($doc);
@@ -130,7 +133,7 @@ class search_elastic_engine_external_testcase extends advanced_testcase {
         $rec2 = new \stdClass();
         $rec2->content = "this is an assignment on frogs and toads";
         $rec2->courseid = 2;
-        $area = new core_mocksearch\search\mock_search_area();
+        $area = new \core_mocksearch\search\mock_search_area();
         $record2 = $this->generator->create_record($rec2);
         $doc2 = $area->get_document($record2);
         $this->engine->add_document($doc2);
@@ -139,13 +142,13 @@ class search_elastic_engine_external_testcase extends advanced_testcase {
         // this happens in near realtime, not immediately.
         sleep(1);
 
-        $results = search_elastic_external::search(
+        $results = \search_elastic_external::search(
                 'video', 0, 0, '', 100,
                 [1],
                 ['core_mocksearch-mock_search_area']);
 
         // We need to execute the return values cleaning process to simulate the web service server.
-        $results = external_api::clean_returnvalue(search_elastic_external::search_returns(), $results);
+        $results = \external_api::clean_returnvalue(\search_elastic_external::search_returns(), $results);
 
         // Check the results.
         $this->assertEquals('this is a <span class="highlight">video</span>', $results[0]['content']);
@@ -159,10 +162,10 @@ class search_elastic_engine_external_testcase extends advanced_testcase {
      */
     public function test_external_search_areas() {
 
-        $results = search_elastic_external::search_areas(false);
+        $results = \search_elastic_external::search_areas(false);
 
         // We need to execute the return values cleaning process to simulate the web service server.
-        $results = external_api::clean_returnvalue(search_elastic_external::search_areas_returns(), $results);
+        $results = \external_api::clean_returnvalue(\search_elastic_external::search_areas_returns(), $results);
 
         $this->assertEquals('core_mocksearch-mock_search_area', $results[0]['areaid']);
 

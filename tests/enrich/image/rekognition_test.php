@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace search_elastic\enrich\image;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -33,8 +35,9 @@ require_once($CFG->dirroot . '/search/engine/elastic/tests/fixtures/aws_rekognit
  * @package     search_elastic
  * @copyright   Matt Porritt <mattp@catalyst-au.net>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers      \search_elastic\enrich\image\rekognition
  */
-class search_elastic_image_recognition_testcase extends advanced_testcase {
+class rekognition_test extends \advanced_testcase {
 
     /**
      * Test image with AWS rekgonition
@@ -64,11 +67,11 @@ class search_elastic_image_recognition_testcase extends advanced_testcase {
         // Mock out thw AWS Rekognition client and response.
         // Add missing data to stub record object.
         $builder = $this->getMockBuilder('\search_elastic\enrich\image\rekognition');
-        $builder->setMethods(array('get_rekognition_client'));
+        $builder->onlyMethods(array('get_rekognition_client'));
         $builder->setConstructorArgs(array($config));
         $stub = $builder->getMock();
 
-        $rekognition = new MockRekognition;
+        $rekognition = new \MockRekognition;
         $stub->method('get_rekognition_client')->willReturn($rekognition);
 
         $filetext = $stub->analyze_file($file);

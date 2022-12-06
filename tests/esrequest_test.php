@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace search_elastic;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -33,7 +35,6 @@ use \GuzzleHttp\Handler\MockHandler;
 use \GuzzleHttp\HandlerStack;
 use \GuzzleHttp\Middleware;
 use \GuzzleHttp\Psr7\Response;
-use \GuzzleHttp\Psr7\Request;
 
 /**
  * Tests for esrequest class
@@ -41,11 +42,12 @@ use \GuzzleHttp\Psr7\Request;
  * @package     search_elastic
  * @copyright   Matt Porritt <mattp@catalyst-au.net>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers      \search_elastic\esrequest
  */
-class search_elastic_esrequest_testcase extends advanced_testcase {
+class esrequest_test extends \advanced_testcase {
 
     /**
-     * @var stdClass $cfg Backup of global config.
+     * @var \stdClass $cfg Backup of global config.
      */
     protected $cfg;
 
@@ -389,7 +391,7 @@ class search_elastic_esrequest_testcase extends advanced_testcase {
         $CFG->proxybypass = 'localhost, 127.0.0.1';
 
         // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\search_elastic\esrequest', 'proxyconstruct');
+        $method = new \ReflectionMethod('\search_elastic\esrequest', 'proxyconstruct');
         $method->setAccessible(true); // Allow accessing of private method.
         $proxy = $method->invoke(new \search_elastic\esrequest); // Get result of invoked method.
 
@@ -414,7 +416,7 @@ class search_elastic_esrequest_testcase extends advanced_testcase {
         $CFG->proxypassword = 'password';
 
         // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\search_elastic\esrequest', 'proxyconstruct');
+        $method = new \ReflectionMethod('\search_elastic\esrequest', 'proxyconstruct');
         $method->setAccessible(true); // Allow accessing of private method.
         $proxy = $method->invoke(new \search_elastic\esrequest); // Get result of invoked method.
 
@@ -439,7 +441,7 @@ class search_elastic_esrequest_testcase extends advanced_testcase {
         $CFG->proxypassword = 'password';
 
         // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\search_elastic\esrequest', 'proxyconstruct');
+        $method = new \ReflectionMethod('\search_elastic\esrequest', 'proxyconstruct');
         $method->setAccessible(true); // Allow accessing of private method.
         $proxy = $method->invoke(new \search_elastic\esrequest); // Get result of invoked method.
 
@@ -462,7 +464,7 @@ class search_elastic_esrequest_testcase extends advanced_testcase {
         $CFG->proxytype = 'SOCKS5';
 
         // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\search_elastic\esrequest', 'proxyconstruct');
+        $method = new \ReflectionMethod('\search_elastic\esrequest', 'proxyconstruct');
         $method->setAccessible(true); // Allow accessing of private method.
         $proxy = $method->invoke(new \search_elastic\esrequest); // Get result of invoked method.
 
