@@ -118,7 +118,11 @@ class search_elastic_esrequest_testcase extends advanced_testcase {
         $this->assertEquals('bar=blerg', $request->getUri()->getQuery());
         $this->assertTrue($request->hasHeader('X-Amz-Date'));
         $this->assertTrue($request->hasHeader('Authorization'));
-        $this->assertRegexp('/key_id.{10}region/', $authheader[0]);
+        if (method_exists($this, 'assertFileDoesNotExist')) {
+            $this->assertMatchesRegularExpression('/key_id.{10}region/', $authheader[0]);
+        } else {
+            $this->assertRegexp('/key_id.{10}region/', $authheader[0]);
+        }
     }
 
     /**
@@ -193,7 +197,11 @@ class search_elastic_esrequest_testcase extends advanced_testcase {
         $this->assertEquals('bar=blerg', $request->getUri()->getQuery());
         $this->assertTrue($request->hasHeader('X-Amz-Date'));
         $this->assertTrue($request->hasHeader('Authorization'));
-        $this->assertRegexp('/key_id.{10}region/', $authheader[0]);
+        if (method_exists($this, 'assertFileDoesNotExist')) {
+            $this->assertMatchesRegularExpression('/key_id.{10}region/', $authheader[0]);
+        } else {
+            $this->assertRegexp('/key_id.{10}region/', $authheader[0]);
+        }
         $this->assertTrue($request->hasHeader('content-type'));
         $this->assertEquals(array('application/json'), $contentheader);
     }
@@ -270,7 +278,11 @@ class search_elastic_esrequest_testcase extends advanced_testcase {
         $this->assertEquals('bar=blerg', $request->getUri()->getQuery());
         $this->assertTrue($request->hasHeader('X-Amz-Date'));
         $this->assertTrue($request->hasHeader('Authorization'));
-        $this->assertRegexp('/key_id.{10}region/', $authheader[0]);
+        if (method_exists($this, 'assertFileDoesNotExist')) {
+            $this->assertMatchesRegularExpression('/key_id.{10}region/', $authheader[0]);
+        } else {
+            $this->assertRegexp('/key_id.{10}region/', $authheader[0]);
+        }
         $this->assertTrue($request->hasHeader('content-type'));
         $this->assertEquals(array('application/json'), $contentheader);
     }
@@ -341,7 +353,11 @@ class search_elastic_esrequest_testcase extends advanced_testcase {
         $this->assertEquals('bar=blerg', $request->getUri()->getQuery());
         $this->assertTrue($request->hasHeader('X-Amz-Date'));
         $this->assertTrue($request->hasHeader('Authorization'));
-        $this->assertRegexp('/key_id.{10}region/', $authheader[0]);
+        if (method_exists($this, 'assertFileDoesNotExist')) {
+            $this->assertMatchesRegularExpression('/key_id.{10}region/', $authheader[0]);
+        } else {
+            $this->assertRegexp('/key_id.{10}region/', $authheader[0]);
+        }
 
     }
 
