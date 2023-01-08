@@ -380,106 +380,11 @@ class esrequest_test extends \advanced_testcase {
     }
 
     /**
-     * Test that Guzzle proxy array is correctly constructed
-     * from Moodle Proxy settings.
-     */
-    public function test_proxy_construct() {
-        global $CFG;
-        $CFG->proxyhost = 'localhost';
-        $CFG->proxyport = 3128;
-        $CFG->proxybypass = 'localhost, 127.0.0.1';
-
-        // We're testing a private method, so we need to setup reflector magic.
-        $method = new \ReflectionMethod('\search_elastic\esrequest', 'proxyconstruct');
-        $method->setAccessible(true); // Allow accessing of private method.
-        $proxy = $method->invoke(new \search_elastic\esrequest); // Get result of invoked method.
-
-        $expected = ['proxy' => ['http'  => 'tcp://localhost:3128',
-                                 'https'  => 'tcp://localhost:3128',
-                                 'no' => ['localhost', '127.0.0.1']]];
-
-        $this->assertEquals($expected, $proxy, $canonicalize = true);
-    }
-
-    /**
-     * Test that Guzzle proxy array is correctly constructed
-     * from Moodle Proxy settings.
-     * With proxy authentication.
-     */
-    public function test_proxy_construct_auth() {
-        global $CFG;
-        $CFG->proxyhost = 'localhost';
-        $CFG->proxyport = 3128;
-        $CFG->proxybypass = 'localhost, 127.0.0.1';
-        $CFG->proxyuser = 'user1';
-        $CFG->proxypassword = 'password';
-
-        // We're testing a private method, so we need to setup reflector magic.
-        $method = new \ReflectionMethod('\search_elastic\esrequest', 'proxyconstruct');
-        $method->setAccessible(true); // Allow accessing of private method.
-        $proxy = $method->invoke(new \search_elastic\esrequest); // Get result of invoked method.
-
-        $expected = ['proxy' => ['http'  => 'tcp://user1:password@localhost:3128',
-                                 'https'  => 'tcp://user1:password@localhost:3128',
-                                 'no' => ['localhost', '127.0.0.1']]];
-
-        $this->assertEquals($expected, $proxy, $canonicalize = true);
-    }
-
-    /**
-     * Test that Guzzle proxy array is correctly constructed
-     * from Moodle Proxy settings.
-     * With proxy authentication and no proxy bypass.
-     */
-    public function test_proxy_construct_no_bypass() {
-        global $CFG;
-        $CFG->proxyhost = 'localhost';
-        $CFG->proxyport = 3128;
-        $CFG->proxybypass = '';
-        $CFG->proxyuser = 'user1';
-        $CFG->proxypassword = 'password';
-
-        // We're testing a private method, so we need to setup reflector magic.
-        $method = new \ReflectionMethod('\search_elastic\esrequest', 'proxyconstruct');
-        $method->setAccessible(true); // Allow accessing of private method.
-        $proxy = $method->invoke(new \search_elastic\esrequest); // Get result of invoked method.
-
-        $expected = ['proxy' => ['http'  => 'tcp://user1:password@localhost:3128',
-                                 'https'  => 'tcp://user1:password@localhost:3128']];
-
-        $this->assertEquals($expected, $proxy, $canonicalize = true);
-    }
-
-    /**
-     * Test that Guzzle proxy array is correctly constructed
-     * from Moodle Proxy settings.
-     * Using socks as the protocol.
-     */
-    public function test_proxy_construct_socks() {
-        global $CFG;
-        $CFG->proxyhost = 'localhost';
-        $CFG->proxyport = 3128;
-        $CFG->proxybypass = 'localhost, 127.0.0.1';
-        $CFG->proxytype = 'SOCKS5';
-
-        // We're testing a private method, so we need to setup reflector magic.
-        $method = new \ReflectionMethod('\search_elastic\esrequest', 'proxyconstruct');
-        $method->setAccessible(true); // Allow accessing of private method.
-        $proxy = $method->invoke(new \search_elastic\esrequest); // Get result of invoked method.
-
-        $expected = ['proxy' => ['http'  => 'socks5://localhost:3128',
-                                 'https'  => 'socks5://localhost:3128',
-                                 'no' => ['localhost', '127.0.0.1']]];
-
-        $this->assertEquals($expected, $proxy, $canonicalize = true);
-    }
-
-    /**
      * Test esrequest get with proxy functionality
      */
     public function test_proxy_get() {
         global $CFG;
-        $CFG->proxyhost = 'localhost';
+        $CFG->proxyhost = 'proxy.com';
         $CFG->proxyport = 3128;
         $CFG->proxybypass = 'localhost, 127.0.0.1';
 
@@ -495,24 +400,21 @@ class esrequest_test extends \advanced_testcase {
         // Add the history middleware to the handler stack.
         $stack->push($history);
 
-        $url = 'http://localhost:8080/foo?bar=blerg';
+        $url = 'http://example.com:8080/foo?bar=blerg';
         $client = new \search_elastic\esrequest($stack);
-        $response = $client->get($url);
+        $client->get($url);
         $request = $container[0]['request'];
-        $hostheader = $request->getHeader('Host');
 
-        $proxy = $container[0]['options']['proxy'];
-        $expected = ['http'  => 'tcp://localhost:3128',
-                     'https'  => 'tcp://localhost:3128',
-                     'no' => ['localhost', '127.0.0.1']];
+        $lastrequestoptions = $mock->getLastOptions();
+        $this->assertArrayHasKey('proxy', $lastrequestoptions);
+        $expected = 'proxy.com:3128';
 
         // Check the results.
         $this->assertEquals('http', $request->getUri()->getScheme());
-        $this->assertEquals('localhost', $request->getUri()->getHost());
+        $this->assertEquals('example.com', $request->getUri()->getHost());
         $this->assertEquals('8080', $request->getUri()->getPort());
         $this->assertEquals('/foo', $request->getUri()->getPath());
         $this->assertEquals('bar=blerg', $request->getUri()->getQuery());
-        $this->assertEquals($expected, $proxy, $canonicalize = true);
-
+        $this->assertEquals($expected, $lastrequestoptions['proxy']);
     }
 }
