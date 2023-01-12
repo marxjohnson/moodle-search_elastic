@@ -24,7 +24,6 @@ This plugin currently supports Moodle:
 Currently this plugin is tested to work against the following versions of Elasticsearch:
 
 * 5.5.0
-* 6.0.0
 * 6.4.1
 * 6.6.1
 
@@ -81,6 +80,11 @@ The output should look something like:
 ```
 
 By default the Elasticsearch service is available on: `http://localhost:9200`
+
+### Docker
+
+You can also run Elasticsearch with Docker. The project publishes an [offical container](https://hub.docker.com/_/elasticsearch)
+for supported version with instructions.
 
 ## Azure Elasticsearch Setup
 To use this plugin first you will need to setup an Elaticsearch service.

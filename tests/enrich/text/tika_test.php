@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace search_elastic;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -38,8 +40,9 @@ use \GuzzleHttp\Psr7\Response;
  * @package     search_elastic
  * @copyright   Matt Porritt <mattp@catalyst-au.net>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers      \search_elastic\enrich\text\tika
  */
-class search_elastic_text_tika_testcase extends advanced_testcase {
+class tika_test extends \advanced_testcase {
 
      /**
       * Test binary text file extraction request

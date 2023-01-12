@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace search_elastic;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -33,7 +35,6 @@ use \GuzzleHttp\Handler\MockHandler;
 use \GuzzleHttp\HandlerStack;
 use \GuzzleHttp\Middleware;
 use \GuzzleHttp\Psr7\Response;
-use \GuzzleHttp\Psr7\Request;
 
 /**
  * Tests for esrequest class
@@ -41,15 +42,49 @@ use \GuzzleHttp\Psr7\Request;
  * @package     search_elastic
  * @copyright   Matt Porritt <mattp@catalyst-au.net>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers      \search_elastic\esrequest
  */
-class search_elastic_esrequest_testcase extends advanced_testcase {
+class esrequest_test extends \advanced_testcase {
+
+    /**
+     * @var \stdClass $cfg Backup of global config.
+     */
+    protected $cfg;
+
+    /**
+     * Polyfill to support the new regexp assertion in place of the old, deprecated one.
+     *
+     * This can be removed once we no longer need to support Moodle <3.11/PHPUnit 8.5.
+     *
+     * @param string $method
+     * @param array $args
+     * @return mixed|void
+     */
+    public function __call(string $method, array $args) {
+        if ($method === 'assertMatchesRegularExpression' && method_exists($this, 'assertRegExp')) {
+            return call_user_func_array([$this, 'assertRegExp'], $args);
+        }
+    }
 
     /**
      * Test setup.
      */
     public function setUp(): void {
+        global $CFG;
+        $this->cfg = clone $CFG;
         $this->resetAfterTest(true);
         new \search_elastic\engine();
+    }
+
+    /**
+     * Reset global $CFG object.
+     *
+     * @return void
+     */
+    public function tearDown(): void {
+        global $CFG;
+        $CFG = clone $this->cfg;
+        unset($this->cfg);
     }
 
     /**
@@ -118,11 +153,7 @@ class search_elastic_esrequest_testcase extends advanced_testcase {
         $this->assertEquals('bar=blerg', $request->getUri()->getQuery());
         $this->assertTrue($request->hasHeader('X-Amz-Date'));
         $this->assertTrue($request->hasHeader('Authorization'));
-        if (method_exists($this, 'assertFileDoesNotExist')) {
-            $this->assertMatchesRegularExpression('/key_id.{10}region/', $authheader[0]);
-        } else {
-            $this->assertRegexp('/key_id.{10}region/', $authheader[0]);
-        }
+        $this->assertMatchesRegularExpression('/key_id.{10}region/', $authheader[0]);
     }
 
     /**
@@ -197,11 +228,7 @@ class search_elastic_esrequest_testcase extends advanced_testcase {
         $this->assertEquals('bar=blerg', $request->getUri()->getQuery());
         $this->assertTrue($request->hasHeader('X-Amz-Date'));
         $this->assertTrue($request->hasHeader('Authorization'));
-        if (method_exists($this, 'assertFileDoesNotExist')) {
-            $this->assertMatchesRegularExpression('/key_id.{10}region/', $authheader[0]);
-        } else {
-            $this->assertRegexp('/key_id.{10}region/', $authheader[0]);
-        }
+        $this->assertMatchesRegularExpression('/key_id.{10}region/', $authheader[0]);
         $this->assertTrue($request->hasHeader('content-type'));
         $this->assertEquals(array('application/json'), $contentheader);
     }
@@ -278,11 +305,7 @@ class search_elastic_esrequest_testcase extends advanced_testcase {
         $this->assertEquals('bar=blerg', $request->getUri()->getQuery());
         $this->assertTrue($request->hasHeader('X-Amz-Date'));
         $this->assertTrue($request->hasHeader('Authorization'));
-        if (method_exists($this, 'assertFileDoesNotExist')) {
-            $this->assertMatchesRegularExpression('/key_id.{10}region/', $authheader[0]);
-        } else {
-            $this->assertRegexp('/key_id.{10}region/', $authheader[0]);
-        }
+        $this->assertMatchesRegularExpression('/key_id.{10}region/', $authheader[0]);
         $this->assertTrue($request->hasHeader('content-type'));
         $this->assertEquals(array('application/json'), $contentheader);
     }
@@ -353,12 +376,7 @@ class search_elastic_esrequest_testcase extends advanced_testcase {
         $this->assertEquals('bar=blerg', $request->getUri()->getQuery());
         $this->assertTrue($request->hasHeader('X-Amz-Date'));
         $this->assertTrue($request->hasHeader('Authorization'));
-        if (method_exists($this, 'assertFileDoesNotExist')) {
-            $this->assertMatchesRegularExpression('/key_id.{10}region/', $authheader[0]);
-        } else {
-            $this->assertRegexp('/key_id.{10}region/', $authheader[0]);
-        }
-
+        $this->assertMatchesRegularExpression('/key_id.{10}region/', $authheader[0]);
     }
 
     /**
@@ -366,13 +384,13 @@ class search_elastic_esrequest_testcase extends advanced_testcase {
      * from Moodle Proxy settings.
      */
     public function test_proxy_construct() {
-        $this->resetAfterTest(true);
-        set_config('proxyhost', 'localhost');
-        set_config('proxyport', 3128);
-        set_config('proxybypass', 'localhost, 127.0.0.1');
+        global $CFG;
+        $CFG->proxyhost = 'localhost';
+        $CFG->proxyport = 3128;
+        $CFG->proxybypass = 'localhost, 127.0.0.1';
 
         // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\search_elastic\esrequest', 'proxyconstruct');
+        $method = new \ReflectionMethod('\search_elastic\esrequest', 'proxyconstruct');
         $method->setAccessible(true); // Allow accessing of private method.
         $proxy = $method->invoke(new \search_elastic\esrequest); // Get result of invoked method.
 
@@ -389,15 +407,15 @@ class search_elastic_esrequest_testcase extends advanced_testcase {
      * With proxy authentication.
      */
     public function test_proxy_construct_auth() {
-        $this->resetAfterTest(true);
-        set_config('proxyhost', 'localhost');
-        set_config('proxyport', 3128);
-        set_config('proxybypass', 'localhost, 127.0.0.1');
-        set_config('proxyuser', 'user1');
-        set_config('proxypassword', 'password');
+        global $CFG;
+        $CFG->proxyhost = 'localhost';
+        $CFG->proxyport = 3128;
+        $CFG->proxybypass = 'localhost, 127.0.0.1';
+        $CFG->proxyuser = 'user1';
+        $CFG->proxypassword = 'password';
 
         // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\search_elastic\esrequest', 'proxyconstruct');
+        $method = new \ReflectionMethod('\search_elastic\esrequest', 'proxyconstruct');
         $method->setAccessible(true); // Allow accessing of private method.
         $proxy = $method->invoke(new \search_elastic\esrequest); // Get result of invoked method.
 
@@ -414,15 +432,15 @@ class search_elastic_esrequest_testcase extends advanced_testcase {
      * With proxy authentication and no proxy bypass.
      */
     public function test_proxy_construct_no_bypass() {
-        $this->resetAfterTest(true);
-        set_config('proxyhost', 'localhost');
-        set_config('proxyport', 3128);
-        set_config('proxybypass', '');
-        set_config('proxyuser', 'user1');
-        set_config('proxypassword', 'password');
+        global $CFG;
+        $CFG->proxyhost = 'localhost';
+        $CFG->proxyport = 3128;
+        $CFG->proxybypass = '';
+        $CFG->proxyuser = 'user1';
+        $CFG->proxypassword = 'password';
 
         // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\search_elastic\esrequest', 'proxyconstruct');
+        $method = new \ReflectionMethod('\search_elastic\esrequest', 'proxyconstruct');
         $method->setAccessible(true); // Allow accessing of private method.
         $proxy = $method->invoke(new \search_elastic\esrequest); // Get result of invoked method.
 
@@ -438,14 +456,14 @@ class search_elastic_esrequest_testcase extends advanced_testcase {
      * Using socks as the protocol.
      */
     public function test_proxy_construct_socks() {
-        $this->resetAfterTest(true);
-        set_config('proxyhost', 'localhost');
-        set_config('proxyport', 3128);
-        set_config('proxybypass', 'localhost, 127.0.0.1');
-        set_config('proxytype', 'SOCKS5');
+        global $CFG;
+        $CFG->proxyhost = 'localhost';
+        $CFG->proxyport = 3128;
+        $CFG->proxybypass = 'localhost, 127.0.0.1';
+        $CFG->proxytype = 'SOCKS5';
 
         // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\search_elastic\esrequest', 'proxyconstruct');
+        $method = new \ReflectionMethod('\search_elastic\esrequest', 'proxyconstruct');
         $method->setAccessible(true); // Allow accessing of private method.
         $proxy = $method->invoke(new \search_elastic\esrequest); // Get result of invoked method.
 
@@ -460,10 +478,10 @@ class search_elastic_esrequest_testcase extends advanced_testcase {
      * Test esrequest get with proxy functionality
      */
     public function test_proxy_get() {
-        $this->resetAfterTest(true);
-        set_config('proxyhost', 'localhost');
-        set_config('proxyport', 3128);
-        set_config('proxybypass', 'localhost, 127.0.0.1');
+        global $CFG;
+        $CFG->proxyhost = 'localhost';
+        $CFG->proxyport = 3128;
+        $CFG->proxybypass = 'localhost, 127.0.0.1';
 
         $container = [];
         $history = Middleware::history($container);

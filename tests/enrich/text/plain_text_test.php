@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace search_elastic;
+
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require($CFG->dirroot . '/search/engine/elastic/classes/enrich/text/plain_text.php');
@@ -32,8 +34,9 @@ require($CFG->dirroot . '/search/engine/elastic/classes/enrich/text/plain_text.p
  * @package     search_elastic
  * @copyright   Matt Porritt <mattp@catalyst-au.net>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers      \search_elastic\enrich\text\plain_text
  */
-class search_elastic_text_plain_text_testcase extends advanced_testcase {
+class plain_text_test extends \advanced_testcase {
 
     /**
      * Test binary text file extraction request.
