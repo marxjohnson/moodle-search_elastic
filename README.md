@@ -1,4 +1,4 @@
-![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/catalyst/moodle-search_elastic/ci/MOODLE_310_STABLE?label=ci)
+![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/catalyst/moodle-search_elastic/ci.yml?branch=MOODLE_310_STABLE)
 
 # Moodle Global Search - Elasticsearch Backend
 
