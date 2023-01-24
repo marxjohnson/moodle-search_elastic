@@ -373,24 +373,24 @@ class engine extends \core_search\engine {
             foreach ($indexedfiles as $indexedfile) {
                 $fileid = $indexedfile->_source->id;
 
-                if (isset ( $files [$fileid] )) {
+                if (isset($files[$fileid])) {
                     // Check for changes that would mean we need to re-index the file. If so, just leave in $files.
                     // Filelib does not guarantee time modified is updated, so we will check important values.
-                    if ($indexedfile->_source->modified != $files [$fileid]->get_timemodified ()) {
+                    if ($indexedfile->_source->modified != $files[$fileid]->get_timemodified()) {
                         continue;
                     }
-                    if (strcmp ( $indexedfile->_source->title, $files [$fileid]->get_filename () ) !== 0) {
+                    if (strcmp($indexedfile->_source->title, $files[$fileid]->get_filename()) !== 0) {
                         continue;
                     }
-                    if ($indexedfile->_source->filecontenthash != $files [$fileid]->get_contenthash ()) {
+                    if ($indexedfile->_source->filecontenthash != $files[$fileid]->get_contenthash()) {
                         continue;
                     }
                     // If the file is already indexed, we can just remove it from the files array and skip it.
-                    unset ( $files [$fileid] );
+                    unset($files[$fileid]);
                 } else {
                     // This means we have found a file that is no longer attached, so we need to delete from the index.
                     // We do it later, since this is progressive, and it could reorder results.
-                    $idstodelete [$indexedfile->_source->id] = $indexedfile->_type;
+                    $idstodelete[$indexedfile->_source->id] = $indexedfile->_type;
                 }
             }
             $count += $rows;
