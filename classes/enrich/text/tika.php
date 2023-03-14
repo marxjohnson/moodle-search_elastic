@@ -147,19 +147,27 @@ class tika extends base_enrich {
         $extractedtext = '';
         $port = $this->tikaport;
         $hostname = $this->tikahostname;
-        $url = $hostname . ':'. $port . '/tika/form';
+        $url = $hostname . ':'. $port . '/rmeta/form'; // Support embedded documents.
         $filesize = $file->get_filesize();
 
         if ($filesize <= $this->config->tikasendsize) {
             $response = $client->postfile($url, $file);
-
             if ($response->getStatusCode() == 200) {
-                $extractedtext = (string) $response->getBody();
+                if ($jsoncontent = json_decode($response->getBody())) {
+                    // Loop through embedded documents.
+                    foreach ($jsoncontent as $datacontent) {
+                        $content = $datacontent->{"X-TIKA:content"};
+                        preg_match("/<body.*\/body>/s", $content, $bodytext);
+                        if ($bodytext) {
+                            $extractedtext .= strip_tags($bodytext[0]);
+                        }
+                    }
+                } else {
+                    $extractedtext = (string) $response->getBody();
+                }
             }
         }
-
         return $extractedtext;
-
     }
 
     /**
