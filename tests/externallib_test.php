@@ -88,6 +88,7 @@ class externallib_test extends \advanced_testcase {
         $this->generator->setup();
 
         $this->engine = new \search_elastic\testable_engine();
+        $this->luceneversion = $this->engine->get_es_lucene_version();
         $this->search = \testable_core_search::instance($this->engine);
         $areaid = \core_search\manager::generate_areaid('core_mocksearch', 'mock_search_area');
         $this->search->add_search_area($areaid, new \core_mocksearch\search\mock_search_area());
@@ -128,7 +129,7 @@ class externallib_test extends \advanced_testcase {
         $area = new \core_mocksearch\search\mock_search_area();
         $record = $this->generator->create_record($rec);
         $doc = $area->get_document($record);
-        $this->engine->add_document($doc);
+        $this->engine->add_document($doc, false, $this->luceneversion);
 
         $rec2 = new \stdClass();
         $rec2->content = "this is an assignment on frogs and toads";
@@ -136,7 +137,7 @@ class externallib_test extends \advanced_testcase {
         $area = new \core_mocksearch\search\mock_search_area();
         $record2 = $this->generator->create_record($rec2);
         $doc2 = $area->get_document($record2);
-        $this->engine->add_document($doc2);
+        $this->engine->add_document($doc2, false, $this->luceneversion);
 
         // We need to wait for Elastic search to update its index
         // this happens in near realtime, not immediately.

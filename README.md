@@ -26,6 +26,12 @@ Currently this plugin is tested to work against the following versions of Elasti
 * 5.5.0
 * 6.4.1
 * 6.6.1
+* 7.17.9
+* 8.5.3
+
+And following version of OpenSearch:
+
+* 2.4.1
 
 ## Verified Platforms
 This plugin has been tested to work on the following cloud platforms:
