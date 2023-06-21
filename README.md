@@ -168,8 +168,15 @@ These setup steps are the same regardless of how you have setup the Elasticsearc
 ## File Indexing Support
 This plugin uses [Apache Tika](https://tika.apache.org/) for file indexing support. Tika parses files, extracts the text, and return it via a REST API.
 
+Currently this plugin is tested to work against the following versions of Tika:
+
+* 1.16
+* 1.28
+* 2.5.0
+* 2.8.0
+
 ### Tika Setup
-Seting up a Tika test service is straight forward. In most cases on a Linux environment, you can simply download the Java JAR then run the service.
+Setting up a Tika test service is straight forward. In most cases on a Linux environment, you can simply download the Java JAR then run the service.
 <pre><code>
 wget http://apache.mirror.amaze.com.au/tika/tika-server-1.16.jar
 java -jar tika-server-1.16.jar
