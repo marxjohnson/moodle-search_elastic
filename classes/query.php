@@ -275,10 +275,10 @@ class query {
         $contextobj = array('range' => array('modified' => array()));
 
         if (isset($filters->timestart) && $filters->timestart != 0) {
-            $contextobj['range']['modified']['gte'] = $filters->timestart;
+            $contextobj['range']['modified']['gte'] = (string) $filters->timestart;
         }
         if (isset($filters->timeend) && $filters->timeend != 0) {
-            $contextobj['range']['modified']['lte'] = $filters->timeend;
+            $contextobj['range']['modified']['lte'] = (string) $filters->timeend;
         }
 
         return $contextobj;
@@ -414,7 +414,7 @@ class query {
             $groupids = $this->construct_array($filters, 'groupids', 'groupid');
             array_push ($query['query']['bool']['filter']['bool']['must'], $groupids);
         }
-        if ($filters->timestart != 0  || $filters->timeend != 0) {
+        if ($filters->timestart != 0 || $filters->timeend != 0) {
             $timerange = $this->construct_time_range($filters);
             array_push ($query['query']['bool']['filter']['bool']['must'], $timerange);
         }
@@ -429,20 +429,28 @@ class query {
             $courseid = $coursecontext->instanceid;
 
             $courseboost = $this->consruct_location_boosting('courseid', $courseid, self::COURSE_BOOST);
-            array_push ($query['query']['bool']['should'], $courseboost);
+            $query['query']['bool']['should'] = $courseboost;
 
             if ($filters->context->contextlevel !== CONTEXT_COURSE) {
                 // If it's a block or activity, also add a boost for the specific context id.
                 $contextid = $filters->context->id;
                 $contextboost = $this->consruct_location_boosting('contextid', $contextid, self::CONTEXT_BOOST);
-                array_push ($query['query']['bool']['should'], $contextboost);
+                if (count($query['query']['bool']['should'])) {
+                    array_merge ($query['query']['bool']['should'], $contextboost);
+                } else {
+                    $query['query']['bool']['should'] = $contextboost;
+                }
             }
         }
 
         // Add boosting.
         if ($boostedareas) {
             $boosting = $this->consruct_boosting($boostedareas);
-            array_push ($query['query']['bool']['should'], $boosting);
+            if (count($query['query']['bool']['should'])) {
+                array_merge ($query['query']['bool']['should'], $boosting);
+            } else {
+                $query['query']['bool']['should'] = $boosting;
+            }
         }
 
         // Add date based sorting.
