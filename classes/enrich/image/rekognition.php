@@ -28,7 +28,7 @@ use search_elastic\enrich\base\base_enrich;
 
 defined('MOODLE_INTERNAL') || die;
 
-require($CFG->dirroot . '/local/aws/sdk/aws-autoloader.php');
+require_once($CFG->dirroot . '/local/aws/sdk/aws-autoloader.php');
 
 /**
  * Extract imformation from image files using AWS Rekognition.
