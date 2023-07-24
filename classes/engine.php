@@ -270,7 +270,7 @@ class engine extends \core_search\engine {
             $responsecode = $response->getStatusCode();
         }
 
-        if ($responsecode != 200) {
+        if (isset($responsecode) && $responsecode != 200) {
             $returnval = get_string('noserver', 'search_elastic');
         }
 
