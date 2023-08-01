@@ -132,7 +132,9 @@ class esrequest {
      * @return \GuzzleHttp\Psr7\Response
      */
     public function get($url) {
-        $psr7request = new \GuzzleHttp\Psr7\Request('GET', $url);
+        $headers = $this->get_authorization_header();
+
+        $psr7request = new \GuzzleHttp\Psr7\Request('GET', $url, $headers);
 
         if ($this->signing) {
             $psr7request = $this->signrequest($psr7request);
@@ -152,7 +154,9 @@ class esrequest {
      * @return \GuzzleHttp\Psr7\Response
      */
     public function put($url, $params=null) {
-        $headers = ['content-type' => 'application/json'];
+        $headers = $this->get_authorization_header();
+        $headers['content-type'] = 'application/json';
+
         $psr7request = new \GuzzleHttp\Psr7\Request('PUT', $url, $headers, $params);
 
         if ($this->signing) {
@@ -172,7 +176,9 @@ class esrequest {
      * @return \Psr\Http\Message\ResponseInterface|NULL
      */
     public function post($url, $params) {
-        $headers = ['content-type' => 'application/json'];
+        $headers = $this->get_authorization_header();
+        $headers['content-type'] = 'application/json';
+
         $psr7request = new \GuzzleHttp\Psr7\Request('POST', $url, $headers, $params);
 
         if ($this->signing) {
@@ -193,7 +199,8 @@ class esrequest {
      * @return \Psr\Http\Message\ResponseInterface|NULL
      */
     public function postfile($url, $file) {
-        $headers = [];
+        $headers = $this->get_authorization_header();
+
         $contents = $file->get_content_file_handle();
         $multipart = new \GuzzleHttp\Psr7\MultipartStream([
                 [
@@ -217,7 +224,9 @@ class esrequest {
      * @return \Psr\Http\Message\ResponseInterface|NULL
      */
     public function delete($url) {
-        $psr7request = new \GuzzleHttp\Psr7\Request('DELETE', $url);
+        $headers = $this->get_authorization_header();
+
+        $psr7request = new \GuzzleHttp\Psr7\Request('DELETE', $url, $headers);
 
         if ($this->signing) {
             $psr7request = $this->signrequest($psr7request);
@@ -227,5 +236,19 @@ class esrequest {
 
         return $response;
 
+    }
+
+    /**
+     * Return authorization header.
+     *
+     * @return array|string[]
+     */
+    private function get_authorization_header() {
+        if (!empty($this->config->apikey)) {
+            return [
+                'Authorization' => 'ApiKey ' . $this->config->apikey,
+            ];
+        }
+        return [];
     }
 }

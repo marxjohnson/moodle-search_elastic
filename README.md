@@ -38,6 +38,7 @@ This plugin has been tested to work on the following cloud platforms:
 
 * [Microsoft Azure](https://azure.microsoft.com/en-au/)
 * [Amazon Webservices (AWS)](https://aws.amazon.com/)
+* [Elastic Cloud](https://www.elastic.co/)
 
 ## Generic Elasticsearch Setup
 To use this plugin first you will need to setup an Elaticsearch service.
@@ -143,6 +144,13 @@ To use Amazon Webservices (AWS) to provide an Elasticsearch service for Moodle:
 1. Create an AWS account: [Account creation guide](https://aws.amazon.com/premiumsupport/knowledge-center/create-and-activate-aws-account/)
 2. Setup an Elasticsearch service: [AWS Elasticsearch setup guide](http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-createupdatedomains.html)
 
+
+## Elastic Cloud Setup
+
+To use Elastic Cloud to provide an Elasticsearch service for Moodle:
+1. Create an Elastic Cloud account and set up Elasticsearch: [Elasticsearch: Getting Started](https://www.elastic.co/webinars/getting-started-elasticsearch?baymax=default&elektra=docs&storm=top-video)
+2. Generate API Key for your search index and set this key to the moodle plugin settings.  
+
 ## Moodle Plugin Installation
 Once you have setup an Elasticsearch service you can now install the Moodle plugin.
 
@@ -162,8 +170,9 @@ These setup steps are the same regardless of how you have setup the Elasticsearc
 3. Configure the Elasticsearch plugin at: *Site administration > Plugins > Search > Elastic*
 4. Set *hostname* and *port* of your Elasticsearch server
 5. Optionally, change the *Request size* variable. Generally this can be left as is. Some Elasticsearch providers such as AWS have a limit on how big the HTTP payload can be. Therefore we limit it to a size in bytes.
-6. To create the index and populate Elasticsearch with your site's data, run this CLI script. `sudo -u www-data php search/cli/indexer.php --force`
-7. Enable Global search in *Site administration > Advanced features*
+6. Optionally, set API Key as some cloud platforms (e.g. Elastic Cloud) use it for authorizing HTTP requests.
+7. To create the index and populate Elasticsearch with your site's data, run this CLI script. `sudo -u www-data php search/cli/indexer.php --force`
+8. Enable Global search in *Site administration > Advanced features*
 
 ## File Indexing Support
 This plugin uses [Apache Tika](https://tika.apache.org/) for file indexing support. Tika parses files, extracts the text, and return it via a REST API.

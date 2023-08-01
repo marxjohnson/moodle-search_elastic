@@ -27,6 +27,8 @@ $string['pluginname_help'] = 'Search backend for the Elasticsearch search engine
 
 $string['addfail'] = 'Failed to add document to index';
 $string['advsettings'] = 'Advanced settings';
+$string['apikey'] = 'API key';
+$string['apikey_help'] = 'Some Elasticsearch providers such as  Elastic Cloud require API key to authorize HTTP requests.';
 $string['aws'] = 'AWS';
 $string['adminsettings'] = 'Plugin settings';
 $string['basicsettings'] = 'Basic settings';
@@ -82,6 +84,7 @@ $string['privacy:metadata:data'] = 'Personal data passed through from the search
 $string['queryerror'] = 'Error executing query in search engine: {$a->reason}
 
 {$a->help}';
+$string['reachable'] = 'Elasticsearch endpoint reachable';
 $string['region'] = 'Region';
 $string['region_help'] = 'The AWS region the Elasticsearch instance is in, e.g. ap-southeast-2';
 $string['rekregion'] = 'Region';
@@ -107,7 +110,7 @@ $string['signingkeyid'] = 'Key ID';
 $string['signingkeyid_help'] = 'The ID of the key to use for signing requests.';
 $string['signingsecretkey'] = 'Secret Key';
 $string['signingsecretkey_help'] = 'The secret key to use to sign requests.';
-$string['signingsettings'] = 'Request signing settings';
+$string['signingsettings'] = 'Request signing settings (compatible with AWS)';
 $string['signingsettings_help'] = 'If your Elasticsearch setup uses Request Signing enable and configure it below.
 
 This generally only applies if you are using Amazon Web Service (AWS) to provide your Elasticsearch Endpoint';

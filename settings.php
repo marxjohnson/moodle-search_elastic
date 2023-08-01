@@ -28,7 +28,16 @@ if ($hassiteconfig) {
     $ADMIN->add('searchplugins', new admin_category('search_elastic', get_string('pluginname', 'search_elastic')));
     $settings = new admin_settingpage('elasticsettings', get_string('adminsettings', 'search_elastic'));
 
-    $settings->add(new admin_setting_heading('basicsettings', get_string('basicsettings', 'search_elastic'), ''));
+    // Check status of the server.
+    $engine = new \search_elastic\engine();
+    $status = $engine->is_server_ready();
+    if ($status === true) {
+        $statustext = $OUTPUT->notification(get_string('reachable', 'search_elastic'), \core\output\notification::NOTIFY_SUCCESS);
+    } else {
+        $statustext = $OUTPUT->notification($status);
+    }
+
+    $settings->add(new admin_setting_heading('basicsettings', get_string('basicsettings', 'search_elastic'), $statustext));
     $settings->add(new admin_setting_configtext('search_elastic/hostname', get_string ('hostname', 'search_elastic'),
         get_string ('hostname_help', 'search_elastic'), 'http://127.0.0.1', PARAM_URL));
 
@@ -41,12 +50,8 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configtext('search_elastic/sendsize', get_string ('sendsize', 'search_elastic'),
         get_string ('sendsize_help', 'search_elastic'), 9000000, PARAM_ALPHANUMEXT));
 
-    $settings->add(new admin_setting_heading('searchsettings', get_string('searchsettings', 'search_elastic'), ''));
-    $settings->add(new admin_setting_configcheckbox('search_elastic/wildcardend', get_string('wildcardend', 'search_elastic'),
-        get_string ('wildcardend_help', 'search_elastic'), 0));
-
-    $settings->add(new admin_setting_configcheckbox('search_elastic/wildcardstart', get_string('wildcardstart', 'search_elastic'),
-        get_string ('wildcardstart_help', 'search_elastic'), 0));
+    $settings->add(new admin_setting_configtext('search_elastic/apikey', get_string ('apikey', 'search_elastic'),
+        get_string ('apikey_help', 'search_elastic'), ''));
 
     $settings->add(new admin_setting_heading('signingsettings', get_string('signingsettings', 'search_elastic'), ''));
     $settings->add(new admin_setting_configcheckbox('search_elastic/signing', get_string('signing', 'search_elastic'),
@@ -61,6 +66,13 @@ if ($hassiteconfig) {
 
     $settings->add(new admin_setting_configtext('search_elastic/region', get_string ('region', 'search_elastic'),
         get_string ('region_help', 'search_elastic'), 'us-west-2', PARAM_TEXT));
+
+    $settings->add(new admin_setting_heading('searchsettings', get_string('searchsettings', 'search_elastic'), ''));
+    $settings->add(new admin_setting_configcheckbox('search_elastic/wildcardend', get_string('wildcardend', 'search_elastic'),
+        get_string ('wildcardend_help', 'search_elastic'), 0));
+
+    $settings->add(new admin_setting_configcheckbox('search_elastic/wildcardstart', get_string('wildcardstart', 'search_elastic'),
+        get_string ('wildcardstart_help', 'search_elastic'), 0));
 
     $settings->add(new admin_setting_heading('advsettings', get_string('advsettings', 'search_elastic'), ''));
     $settings->add(new admin_setting_configcheckbox('search_elastic/logging', get_string('logging', 'search_elastic'),
