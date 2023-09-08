@@ -36,6 +36,8 @@ $string['boostdescription'] = 'These settings control the boosting settings for 
 $string['boostsettings'] = 'Boosting settings';
 $string['boostvalue'] = '';
 $string['boostvalue_help'] = 'Set the value you want this search area to be boosted by in the search results. Higher boost values give more priority.';
+$string['checkserver_ready_check'] = 'Elastic server connection';
+$string['connectiontest'] = 'Server connection test';
 $string['complexhelptext'] = 'The field to be searched may be specified by prefixing the search query with \'title:\', \'content:\', \'name:\', or \'intro:\'. For example, searching for \'title:news\' would return results with the word \'news\' in the title.
 <br>
 Boolean operators (\'AND\', \'OR\') may be used to combine or exclude keywords.
