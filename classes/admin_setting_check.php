@@ -18,6 +18,8 @@ namespace search_elastic;
 
 use admin_setting;
 use core\check\check;
+use core\check\result;
+use core\output\notification;
 
 /**
  * Admin setting for check api.
@@ -76,8 +78,18 @@ class admin_setting_check extends admin_setting {
 
         $resulthtml = $OUTPUT->check_result($checkresult);
         $resultinfo = $checkresult->get_summary();
-
         $out = $resulthtml . ' ' . $resultinfo;
+
+        switch($checkresult->get_status()){
+            case result::CRITICAL:
+            case result::ERROR:
+                $out = $OUTPUT->notification($out, notification::NOTIFY_ERROR, false);
+                break;
+
+            case result::OK:
+                $out = $OUTPUT->notification($out, notification::NOTIFY_SUCCESS, false);
+                break;
+        }
         return format_admin_setting($this, $this->visiblename, '', $out);
     }
 }
