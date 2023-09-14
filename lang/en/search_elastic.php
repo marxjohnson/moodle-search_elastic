@@ -36,6 +36,8 @@ $string['boostdescription'] = 'These settings control the boosting settings for 
 $string['boostsettings'] = 'Boosting settings';
 $string['boostvalue'] = '';
 $string['boostvalue_help'] = 'Set the value you want this search area to be boosted by in the search results. Higher boost values give more priority.';
+$string['checkserver_ready_check'] = 'Elastic server connection';
+$string['connectiontest'] = 'Server connection test';
 $string['complexhelptext'] = 'The field to be searched may be specified by prefixing the search query with \'title:\', \'content:\', \'name:\', or \'intro:\'. For example, searching for \'title:news\' would return results with the word \'news\' in the title.
 <br>
 Boolean operators (\'AND\', \'OR\') may be used to combine or exclude keywords.
@@ -44,6 +46,10 @@ Wildcard characters (\'*\' or \'?\' ) may be used to represent characters in the
 <br>
 For more information, follow this link: {$a}';
 $string['complexhelpurl'] = 'https://lucene.apache.org/core/2_9_4/queryparsersyntax.html';
+$string['connection:na'] = 'Server not configured';
+$string['connection:status'] = 'The configured elastic server at {$a->url} returned the status code {$a->status}';
+$string['connecttimeout'] = 'Connect timeout (seconds)';
+$string['connecttimeout_help'] = 'Guzzle connection timeout. Use 0 to disable. See https://docs.guzzlephp.org/en/stable/request-options.html#connect-timeout';
 $string['enrichdesc'] = 'Global Search can enrich the indexed data used in search by extracting text and other data from files.
 The data extracted from files in Moodle is controlled by the following groups of settings.';
 $string['enrichsettings'] = 'Data enrichment settings';

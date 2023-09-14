@@ -55,3 +55,11 @@ function search_elastic_extend_navigation_user() {
         redirect(new moodle_url('/search/engine/elastic/index.php'));
     }
 }
+
+/**
+ * Returns the status checks for this plugin.
+ * @return array
+ */
+function search_elastic_status_checks(): array {
+    return [new \search_elastic\check\server_ready_check()];
+}

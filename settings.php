@@ -22,22 +22,24 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use search_elastic\admin_setting_check;
+use search_elastic\check\server_ready_check;
+
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
     $ADMIN->add('searchplugins', new admin_category('search_elastic', get_string('pluginname', 'search_elastic')));
     $settings = new admin_settingpage('elasticsettings', get_string('adminsettings', 'search_elastic'));
+    $settings->add(new admin_setting_heading('basicsettings', get_string('basicsettings', 'search_elastic'), ''));
 
-    // Check status of the server.
-    $engine = new \search_elastic\engine();
-    $status = $engine->is_server_ready();
-    if ($status === true) {
-        $statustext = $OUTPUT->notification(get_string('reachable', 'search_elastic'), \core\output\notification::NOTIFY_SUCCESS);
-    } else {
-        $statustext = $OUTPUT->notification($status);
+    // Only check status when when in full tree (i.e. not search)
+    // and only when viewing the elastic settings - this is because it can take a long time to run.
+    // We don't want it to run unnecessarily.
+    if ($ADMIN->fulltree && optional_param('section', null, PARAM_TEXT) == 'elasticsettings') {
+        $settings->add(new admin_setting_check('search_elastic/connectiontest', get_string('connectiontest', 'search_elastic'),
+            new server_ready_check()));
     }
 
-    $settings->add(new admin_setting_heading('basicsettings', get_string('basicsettings', 'search_elastic'), $statustext));
     $settings->add(new admin_setting_configtext('search_elastic/hostname', get_string ('hostname', 'search_elastic'),
         get_string ('hostname_help', 'search_elastic'), 'http://127.0.0.1', PARAM_URL));
 
@@ -52,6 +54,9 @@ if ($hassiteconfig) {
 
     $settings->add(new admin_setting_configtext('search_elastic/apikey', get_string ('apikey', 'search_elastic'),
         get_string ('apikey_help', 'search_elastic'), ''));
+
+    $settings->add(new admin_setting_configtext('search_elastic/connecttimeout', get_string('connecttimeout', 'search_elastic'),
+        get_string('connecttimeout_help', 'search_elastic'), 5, PARAM_INT));
 
     $settings->add(new admin_setting_heading('signingsettings', get_string('signingsettings', 'search_elastic'), ''));
     $settings->add(new admin_setting_configcheckbox('search_elastic/signing', get_string('signing', 'search_elastic'),
