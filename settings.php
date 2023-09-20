@@ -41,7 +41,7 @@ if ($hassiteconfig) {
     }
 
     $settings->add(new admin_setting_configtext('search_elastic/hostname', get_string ('hostname', 'search_elastic'),
-        get_string ('hostname_help', 'search_elastic'), 'http://127.0.0.1', PARAM_URL));
+        get_string ('hostname_help', 'search_elastic'), '', PARAM_URL));
 
     $settings->add(new admin_setting_configtext('search_elastic/port', get_string ('port', 'search_elastic'),
         get_string ('port_help', 'search_elastic'), 9200, PARAM_INT));

@@ -29,6 +29,8 @@
  * @return bool result
  */
 function xmldb_search_elastic_upgrade($oldversion) {
+    global $DB;
+
     if ($oldversion < 2019042101) {
         // Check for corrupt index definition and fix if required.
         // Fix involves deleting all indexed documents.
@@ -56,6 +58,16 @@ function xmldb_search_elastic_upgrade($oldversion) {
         require_once(__DIR__.'/upgradelib.php');
         update_boosting_setting_names();
         upgrade_plugin_savepoint(true, 2020022800, 'search', 'elastic');
+    }
+
+    if ($oldversion < 2023092000) {
+        // Update existing default values that have been set to http://127.0.0.1.
+        // To avoid check API from failing when elasticsearch is not setup.
+        $DB->execute("UPDATE {config_plugins}
+                         SET value = ''
+                       WHERE plugin = 'search_elastic' AND name = 'hostname' AND value = 'http://127.0.0.1'");
+
+        upgrade_plugin_savepoint(true, 2023092000, 'search', 'elastic');
     }
 
     return true;
