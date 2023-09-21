@@ -30,7 +30,6 @@ global $CFG;
 require_once($CFG->dirroot . '/search/tests/fixtures/testable_core_search.php');
 require_once($CFG->dirroot . '/search/tests/fixtures/mock_search_area.php');
 require_once($CFG->dirroot . '/search/engine/elastic/tests/fixtures/testable_engine.php');
-require_once($CFG->dirroot . '/search/engine/elastic/externallib.php');
 
 /**
  * Elasticsearch engine.
