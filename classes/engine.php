@@ -287,8 +287,12 @@ class engine extends \core_search\engine {
         $url = $this->get_url();
         $client = new \search_elastic\esrequest($stack);
 
-        $response = $client->get($url);
-        $responsecode = $response->getStatusCode();
+        try {
+            $response = $client->get($url);
+            $responsecode = $response->getStatusCode();
+        } catch (\GuzzleHttp\Exception\ConnectException $e) {
+            return 503;
+        }
 
         return $responsecode;
     }

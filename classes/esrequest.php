@@ -120,9 +120,6 @@ class esrequest {
             $response = $this->client->send($psr7request);
         } catch (\GuzzleHttp\Exception\BadResponseException $e) {
             $response = $e->getResponse();
-        } catch (\GuzzleHttp\Exception\GuzzleException $e) {
-            // This case does not provide a response object with a consistent interface so we need to make one.
-            $response = new \search_elastic\guzzle_exception();
         }
 
         return $response;
