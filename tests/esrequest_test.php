@@ -88,6 +88,18 @@ class esrequest_test extends \advanced_testcase {
     }
 
     /**
+     * Test that exceptions don't get eaten when host is unreachable.
+     *
+     * @see https://github.com/catalyst/moodle-search_elastic/pull/119 PR #119 for why this matters.
+     */
+    public function test_get_unreachable_host(): void {
+        $this->expectException(\GuzzleHttp\Exception\ConnectException::class);
+        $url = 'http://unreachable:9020';
+        $client = new \search_elastic\esrequest();
+        $response = $client->get($url);
+    }
+
+    /**
      * Test unsigned esrequest get functionality
      */
     public function test_get() {
