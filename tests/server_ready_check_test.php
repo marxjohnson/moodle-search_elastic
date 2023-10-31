@@ -90,4 +90,17 @@ class server_ready_check_test extends advanced_testcase {
         $result = $check->get_result();
         $this->assertEquals($expectedstatus, $result->get_status());
     }
+
+    /**
+     * Test check result when hostname won't resolve.
+     */
+    public function test_check_unreachable_host(): void {
+        $this->resetAfterTest();
+        set_config('hostname', 'unreachable', 'search_elastic');
+
+        $check = new server_ready_check();
+        $result = $check->get_result();
+
+        $this->assertEquals(result::ERROR, $result->get_status());
+    }
 }
