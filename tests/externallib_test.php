@@ -24,6 +24,9 @@
 
 namespace search_elastic;
 
+use core_external\external_api;
+use search_elastic_external;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -37,7 +40,7 @@ require_once($CFG->dirroot . '/search/engine/elastic/tests/fixtures/testable_eng
  * @package     search_elastic
  * @copyright   Matt Porritt <mattp@catalyst-au.net>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers      \search_elastic_external
+ * @covers      search_elastic_external
  */
 class externallib_test extends \advanced_testcase {
     /**
@@ -56,6 +59,8 @@ class externallib_test extends \advanced_testcase {
     protected $engine = null;
 
     public function setUp(): void {
+        global $CFG;
+
         $this->resetAfterTest();
         set_config('enableglobalsearch', true);
 
@@ -94,6 +99,8 @@ class externallib_test extends \advanced_testcase {
 
         $this->setAdminUser();
         $this->search->index(true);
+
+        require_once($CFG->dirroot . '/search/engine/elastic/externallib.php');
     }
 
     public function tearDown(): void {
@@ -142,13 +149,13 @@ class externallib_test extends \advanced_testcase {
         // this happens in near realtime, not immediately.
         sleep(1);
 
-        $results = \search_elastic_external::search(
+        $results = search_elastic_external::search(
                 'video', 0, 0, '', 100,
                 [1],
                 ['core_mocksearch-mock_search_area']);
 
         // We need to execute the return values cleaning process to simulate the web service server.
-        $results = \external_api::clean_returnvalue(\search_elastic_external::search_returns(), $results);
+        $results = external_api::clean_returnvalue(search_elastic_external::search_returns(), $results);
 
         // Check the results.
         $this->assertEquals('this is a <span class="highlight">video</span>', $results[0]['content']);
@@ -162,10 +169,10 @@ class externallib_test extends \advanced_testcase {
      */
     public function test_external_search_areas() {
 
-        $results = \search_elastic_external::search_areas(false);
+        $results = search_elastic_external::search_areas(false);
 
         // We need to execute the return values cleaning process to simulate the web service server.
-        $results = \external_api::clean_returnvalue(\search_elastic_external::search_areas_returns(), $results);
+        $results = external_api::clean_returnvalue(search_elastic_external::search_areas_returns(), $results);
 
         $this->assertEquals('core_mocksearch-mock_search_area', $results[0]['areaid']);
 
