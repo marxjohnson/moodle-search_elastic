@@ -17,7 +17,8 @@ This plugin currently supports Moodle:
 
 | Moodle version      | Branch               |
 | ------------------- | -------------------- |
-| Moodle 3.10 to 3.11 | MOODLE_310_STABLE    |
+| Moodle 4.2 and up   | MOODLE_402_STABLE    |
+| Moodle 3.10 to 4.1  | MOODLE_310_STABLE    |
 | Moodle 3.5 to 3.9   | master               |
 
 ## Elasticsearch Version Support
@@ -149,7 +150,7 @@ To use Amazon Webservices (AWS) to provide an Elasticsearch service for Moodle:
 
 To use Elastic Cloud to provide an Elasticsearch service for Moodle:
 1. Create an Elastic Cloud account and set up Elasticsearch: [Elasticsearch: Getting Started](https://www.elastic.co/webinars/getting-started-elasticsearch?baymax=default&elektra=docs&storm=top-video)
-2. Generate API Key for your search index and set this key to the moodle plugin settings.  
+2. Generate API Key for your search index and set this key to the moodle plugin settings.
 
 ## Moodle Plugin Installation
 Once you have setup an Elasticsearch service you can now install the Moodle plugin.
@@ -304,7 +305,7 @@ https://www.catalyst-au.net/
 
 # Contributing and Support
 
-Issues, and pull requests using github are welcome and encouraged! 
+Issues, and pull requests using github are welcome and encouraged!
 
 https://github.com/catalyst/moodle-search_elastic/issues
 
