@@ -17,8 +17,9 @@ This plugin currently supports Moodle:
 
 | Moodle version      | Branch               |
 | ------------------- | -------------------- |
+| Moodle 4.2 and up   | MOODLE_402_STABLE    |
+| Moodle 3.10 to 4.1  | MOODLE_310_STABLE    |
 | Moodle 3.5 to 3.9   | master               |
-| Moodle 3.10 to 3.11 | MOODLE_310_STABLE    |
 
 ## Elasticsearch Version Support
 Currently this plugin is tested to work against the following versions of Elasticsearch:
@@ -281,7 +282,7 @@ https://www.catalyst-au.net/
 
 # Contributing and Support
 
-Issues, and pull requests using github are welcome and encouraged! 
+Issues, and pull requests using github are welcome and encouraged!
 
 https://github.com/catalyst/moodle-search_elastic/issues
 
