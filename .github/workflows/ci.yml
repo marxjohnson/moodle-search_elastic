@@ -10,4 +10,4 @@ jobs:
     with:
       disable_grunt: true
       disable_phpcpd: true
-      release_branches: MOODLE_402_STABLE
+      release_branches: MOODLE_404_STABLE
