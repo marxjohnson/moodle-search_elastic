@@ -15,12 +15,12 @@ The following features are provided by this plugin:
 ## Supported Moodle Versions
 This plugin currently supports Moodle:
 
-| Moodle version     | Branch               |
-|--------------------| -------------------- |
-| Moodle 4.4 and up  | MOODLE_43_STABLE     |
-| Moodle 4.2 to 4.3  | MOODLE_402_STABLE    |
-| Moodle 3.10 to 4.1 | MOODLE_310_STABLE    |
-| Moodle 3.5 to 3.9  | master               |
+| Moodle version     | Branch            |
+|--------------------|-------------------|
+| Moodle 4.4 and up  | MOODLE_404_STABLE |
+| Moodle 4.2 to 4.3  | MOODLE_402_STABLE |
+| Moodle 3.10 to 4.1 | MOODLE_310_STABLE |
+| Moodle 3.5 to 3.9  | master            |
 
 ## Elasticsearch Version Support
 Currently, this plugin is tested to work against the following versions of Elasticsearch:
