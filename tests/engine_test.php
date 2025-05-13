@@ -65,17 +65,17 @@ class engine_test extends \advanced_testcase {
     /**
      * @var string the Apache Lucene version of the attached Elasticsearch / OpenSearch service.
      */
-    protected string $luceneversion;
+    protected $luceneversion;
 
     /**
      * @var mock_search_area
      */
-    protected mock_search_area $area;
+    protected $area;
 
     /**
      * @var mock_boost_area
      */
-    protected mock_boost_area $areaboost;
+    protected $areaboost;
 
     public function setUp(): void {
         $this->resetAfterTest();
